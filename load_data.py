@@ -6,8 +6,11 @@ Created on Mon Nov 16 09:17:32 2020
 """
 
 import pandas as pd
+from datetime import datetime
+from ast import literal_eval
 
-col_type = {'review_count': 'int64',
+# READ BUSINESS DATABASE
+bud_type = {'review_count': 'int64',
             'Access.dogs': 'boolean', 'Access.wheelchair': 'boolean',
             'Ambience.casual': 'boolean', 'Ambience.classy': 'boolean',
             'Ambience.divey': 'boolean', 'Ambience.hipster': 'boolean',
@@ -34,5 +37,25 @@ col_type = {'review_count': 'int64',
             }
 db_business = pd.read_csv(r"dataset_business.tsv",
                        #header=0, names=list(col_type.keys()),
-                       dtype=col_type,
+                       dtype=bud_type,
                        sep='\t', na_values='None')
+
+
+# READ REVIEW DATABASE
+rvd_type = {'review_id': 'string', 'user_id': 'string', 'business_id': 'string',
+            'stars': 'Int8',
+            'Interact.useful': 'Int32', 'Interact.funny': 'Int32', 'Interact.cool': 'Int32',
+            'content': 'string', 'date': 'string'
+            }
+db_review = pd.read_csv(r"dataset_review.tsv",
+                       dtype=rvd_type,
+                       sep='\t', na_values='None')
+db_review['date'] = pd.to_datetime(db_review['date'])
+
+
+
+# READ USER DATABASE
+db_user = pd.read_csv(r"dataset_user.tsv",
+                       sep='\t', na_values='None')
+db_user.friends.fillna(value="[]", inplace=True)
+db_user.friends = db_user.friends.apply(literal_eval)
