@@ -14,7 +14,7 @@ pred = np.zeros((n_users, n_businesses))
 # interested in (requires extra processing with nan values) 
 # (Question: would computations with nan vlaues yield nan values, in which case we 
 # can proceed as is?)
-user_business_mat -= np.transpose(use_avg)
+user_business_mat -= np.transpose(user_avg)
 for u in n_users:
     for b in n_businesses:
         user_ratings = user_business_mat[:, b]
