@@ -2,15 +2,26 @@
 """
 Created on Mon Nov 16 09:17:32 2020
 
-@author: huang
+@author: wchhuang
 """
-
 import pandas as pd
-from datetime import datetime
 from ast import literal_eval
 
-# READ BUSINESS DATABASE
-bud_type = {'review_count': 'int64',
+
+def load(db_name, db_path):
+    """
+    db_name : string
+        LOAD SPECIFIC DATASET.
+        CHOOSE FROM ['business', 'review', 'user']
+    db_path : string
+        PATH FOR DATA FILE.
+
+    REQUIRES envinit() SETUP.
+    """
+
+    if db_name == 'business':
+        # READ BUSINESS DATABASE
+        bud_type = {'review_count': 'int64',
             'Access.dogs': 'boolean', 'Access.wheelchair': 'boolean',
             'Ambience.casual': 'boolean', 'Ambience.classy': 'boolean',
             'Ambience.divey': 'boolean', 'Ambience.hipster': 'boolean',
@@ -35,27 +46,25 @@ bud_type = {'review_count': 'int64',
             'HOURS.Saturday.Breakfast':'float16', 'HOURS.Saturday.Lunch':'float16', 'HOURS.Saturday.Afternoon':'float16', 'HOURS.Saturday.Dinner':'float16',
             'HOURS.Sunday.Breakfast':'float16', 'HOURS.Sunday.Lunch':'float16', 'HOURS.Sunday.Afternoon':'float16', 'HOURS.Sunday.Dinner':'float16'
             }
-db_business = pd.read_csv(r"dataset_business.tsv",
-                       #header=0, names=list(col_type.keys()),
-                       dtype=bud_type,
-                       sep='\t', na_values='None')
+        db_business = pd.read_csv(db_path, dtype=bud_type,
+                                  sep='\t', na_values='None')
+        return db_business
 
-
-# READ REVIEW DATABASE
-rvd_type = {'review_id': 'string', 'user_id': 'string', 'business_id': 'string',
+    if db_name == 'review':
+        # READ REVIEW DATABASE
+        rvd_type = {'review_id': 'string', 'user_id': 'string', 'business_id': 'string',
             'stars': 'Int8',
             'Interact.useful': 'Int32', 'Interact.funny': 'Int32', 'Interact.cool': 'Int32',
             'content': 'string', 'date': 'string'
             }
-db_review = pd.read_csv(r"dataset_review.tsv",
-                       dtype=rvd_type,
-                       sep='\t', na_values='None')
-db_review['date'] = pd.to_datetime(db_review['date'])
+        db_review = pd.read_csv(db_path, dtype=rvd_type,
+                                sep='\t', na_values='None')
+        db_review['date'] = pd.to_datetime(db_review['date'])
+        return db_review
 
-
-
-# READ USER DATABASE
-db_user = pd.read_csv(r"dataset_user.tsv",
-                       sep='\t', na_values='None')
-db_user.friends.fillna(value="[]", inplace=True)
-db_user.friends = db_user.friends.apply(literal_eval)
+    if db_name == 'user':
+        # READ USER DATABASE
+        db_user = pd.read_csv(db_path, sep='\t', na_values='None')
+        db_user.friends.fillna(value="[]", inplace=True)
+        db_user.friends = db_user.friends.apply(literal_eval)
+        return db_user
