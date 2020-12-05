@@ -4,7 +4,7 @@ import pandas as pd
 import pickle
 
 
-def get_content_recommendations(relev_businesses, top_k_bus, filter_all=False, include_been_to=False):
+def get_content_recommendations(relev_businesses, top_perc, filter_all=False, include_been_to=False):
     content_recommendations = dict()
     line_count = 0
     for line in pd.read_csv(
@@ -16,6 +16,7 @@ def get_content_recommendations(relev_businesses, top_k_bus, filter_all=False, i
             if line[bus_id].item()!=0.0:
                 content_filtered_bus = relev_businesses[bus_id]
                 sorted_relev_bus = sorted(content_filtered_bus, key=content_filtered_bus.get)
+                top_k_bus = int(len(sorted_relev_bus) * top_perc)
                 if not filter_all:
                     if include_been_to:
                         sorted_relev_bus = sorted_relev_bus[:top_k_bus]
@@ -31,8 +32,8 @@ if __name__ == "__main__":
     relev_businesses = dict()
     with open(os.path.join(os.path.dirname(__file__), "distances_wid.p"), 'rb') as handle:
         relev_businesses = pickle.load(handle)
-        
-    content_recommendations = get_content_recommendations(relev_businesses, 10)
-    with open(os.path.join(os.path.dirname(__file__), 'content_recommendation.pickle'), 'wb') as handle:
+    top_perc = 0.1
+    content_recommendations = get_content_recommendations(relev_businesses, top_perc, include_been_to=True)
+    with open(os.path.join(os.path.dirname(__file__), "content_recommendation_"+str(top_perc)+".pickle"), 'wb') as handle:
         pickle.dump(content_recommendations, handle, protocol=pickle.HIGHEST_PROTOCOL)
                 
