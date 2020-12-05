@@ -33,7 +33,7 @@ if __name__ == "__main__":
     with open(os.path.join(os.path.dirname(__file__), "distances_wid.p"), 'rb') as handle:
         relev_businesses = pickle.load(handle)
     top_perc = 0.1
-    content_recommendations = get_content_recommendations(relev_businesses, top_perc)
+    content_recommendations = get_content_recommendations(relev_businesses, top_perc, include_been_to=True)
     with open(os.path.join(os.path.dirname(__file__), "content_recommendation_"+str(top_perc)+".pickle"), 'wb') as handle:
         pickle.dump(content_recommendations, handle, protocol=pickle.HIGHEST_PROTOCOL)
                 
