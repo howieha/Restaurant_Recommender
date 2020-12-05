@@ -21,6 +21,7 @@ def get_content_recommendations(relev_businesses, top_perc, filter_all=False, in
                     if include_been_to:
                         sorted_relev_bus = sorted_relev_bus[:top_k_bus]
                     else:
+                        top_k_bus = min(top_k_bus, len(len(sorted_relev_bus))-1)
                         sorted_relev_bus = sorted_relev_bus[1:top_k_bus+1]
                 recommendation.update(sorted_relev_bus)
         content_recommendations[user_id.item()] = recommendation
@@ -32,8 +33,9 @@ if __name__ == "__main__":
     relev_businesses = dict()
     with open(os.path.join(os.path.dirname(__file__), "distances_wid.p"), 'rb') as handle:
         relev_businesses = pickle.load(handle)
-    top_perc = 0.1
-    content_recommendations = get_content_recommendations(relev_businesses, top_perc, include_been_to=True)
-    with open(os.path.join(os.path.dirname(__file__), "content_recommendation_"+str(top_perc)+".pickle"), 'wb') as handle:
-        pickle.dump(content_recommendations, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    top_percs = [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    for top_perc in top_percs:
+        content_recommendations = get_content_recommendations(relev_businesses, top_perc, include_been_to=True)
+        with open(os.path.join(os.path.dirname(__file__), "content_recommendation_"+str(top_perc)+".pickle"), 'wb') as handle:
+            pickle.dump(content_recommendations, handle, protocol=pickle.HIGHEST_PROTOCOL)
                 
