@@ -4,8 +4,6 @@ Created on Tue Nov 24 12:04:24 2020
 @author: wchhuang
 """
 import numpy as np
-from envinit import Dataset
-import json
 import loadcsv
 import matplotlib.pyplot as plt
 from matplotlib import cm
@@ -82,17 +80,25 @@ def corr(df, ccmethod='pearson',
 
 
 if __name__ == "__main__":
-    # LOAD DATA FROM JSON ENV FILE
-    with open('env.json') as infile:
-        dbinfo = json.load(infile)
-    db = Dataset(initname=dbinfo['name'], initdir=dbinfo['dir']['basedir'])
-    db.setup()
-    db.check_db()
-    del dbinfo, infile
-    df_business = loadcsv.load('business', db.data['business'])
+    # LOAD ENV SETUP
+    from envinit import Dataset
+    db = pickle.load(open("db.p", "rb"))
+    df_business = loadcsv.loadcsv('business', db.data['business'])
+
+    # # LOAD DATA FROM JSON ENV FILE
+    # with open('env.json') as infile:
+    #     dbinfo = json.load(infile)
+    # db = Dataset(initname=dbinfo['name'], initdir=dbinfo['dir']['basedir'])
+    # db.setup()
+    # db.check_db()
+    # del dbinfo, infile
+    # df_business = loadcsv.loadcsv('business', db.data['business'])
 
     pctot, pccat, pcloc = corr(df_business)
     pickle.dump(pctot, open("pctot.p", "wb"))
+
+    pctot_raw, _, _ = corr(df_business, cutoff=-1)
+    pickle.dump(pctot_raw, open("pctot_raw.p", "wb"))
 
     # PLOT CORR COEFFICIENT HEATMAP
     fig1 = plt.figure(figsize=(12, 12))
