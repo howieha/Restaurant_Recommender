@@ -8,7 +8,8 @@ from os import path, chdir, stat
 import sys
 from glob import glob
 from datetime import datetime
-import loadcsv
+import json
+import pickle
 import warnings
 
 basedir_default = path.dirname(__file__)    # CURRENT DIRECTORY
@@ -39,11 +40,20 @@ class Dataset:
     def setup(self):
         chdir(self.datadir)                     # CHANGE TO DATA DIR
         sys.path.append(self.basedir)
+        sys.path.append(self.basedir + r'\\Content-based')
+        sys.path.append(self.basedir + r'\\Misc')
         print('===== DATABASE SETUP =====')
         print('NAME = %s' % self.name)
         print('BASEDIR = %s' % self.basedir)
         print('DATADIR = %s' % self.datadir)
         print()
+
+    def store_json(self, filename):
+        env = {'name': self.name,
+               'dir': {'basedir': self.basedir, 'datadir': self.datadir},
+               'datafiles': self.data}
+        with open(filename, 'w') as outfile:
+            json.dump(env, outfile)
 
     def validate(self, db_name):
         files = glob('*' + db_name + '*.tsv')   # SEARCH FILE LIST
@@ -67,6 +77,7 @@ class Dataset:
         if all([self.validate('business'),
                 self.validate('review'),
                 self.validate('user')]):
+            self.store_json(self.basedir + r'\\env.json')
             print('===== SETUP COMPLETE =====\n')
         else:
             print('SETUP FAILED. PLEASE RESET THE DATA ENVIRONMENT.')
@@ -76,12 +87,8 @@ class Dataset:
 # SETUP DATASET LOCATION
 if __name__ == "__main__":
     db = Dataset(initname='prototype')
+    # db = Dataset(initname='test')
     db.setup()
     db.check_db()
+    pickle.dump(db, open("db.p", "wb"), pickle.HIGHEST_PROTOCOL)
     del basedir_default
-
-    # LOAD DATA FILES
-    print("LOADING DATA...")
-    df_business = loadcsv.load('business', db.data['business'])
-    df_review   = loadcsv.load('review', db.data['review'])
-    df_user     = loadcsv.load('user', db.data['user'])

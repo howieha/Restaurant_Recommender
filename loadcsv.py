@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon Nov 16 09:17:32 2020
-
 @author: wchhuang
 """
 import pandas as pd
 from ast import literal_eval
+import pickle
 
 
-def load(db_name, db_path):
+def loadcsv(db_name, db_path):
     """
     db_name : string
         LOAD SPECIFIC DATASET.
@@ -68,3 +68,14 @@ def load(db_name, db_path):
         db_user.friends.fillna(value="[]", inplace=True)
         db_user.friends = db_user.friends.apply(literal_eval)
         return db_user
+
+
+# LOAD DATA FILES
+if __name__ == "__main__":
+    from envinit import Dataset
+    db = pickle.load(open("db.p", "rb"))
+    print("LOADING DATA...")
+    df_business = loadcsv('business', db.data['business'])
+    df_review   = loadcsv('review', db.data['review'])
+    df_user     = loadcsv('user', db.data['user'])
+    print("LOAD FINISHED.")
