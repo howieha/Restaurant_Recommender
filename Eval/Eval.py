@@ -10,14 +10,6 @@ from collections import defaultdict
 DIRNAME = os.path.dirname(__file__)
 
 
-def count_total_restaurant(file_name= './data/db_business.tsv'):
-
-    file_name = os.path.join(DIRNAME, file_name)
-    business_df = pd.read_csv(file_name, sep='\t')
-    n_resturant = len(business_df)
-    del business_df
-    return n_resturant
-
 def read_pickle(file_name='./data/collaborative_filtered_recommendation_0.1.pickle'):
     """
     :param file_name: RELATIVE path to the folder of this python file
@@ -76,7 +68,7 @@ def reorder_pred_df(pred_data, ground_data):
     """
     pred_data = pred_data.set_index('user_id')
     pred_data = pred_data.reindex(list(ground_data['user_id']))
-    pred_data = pred_data.reset_index()
+    pred_data = pred_data.reset_index(drop=True)
     return pred_data
 
 def top_k(rcmd_list, k):
@@ -96,6 +88,7 @@ def confusion_matrix(pred_rcmd, rcmd, N_rest, k=5):
     # change the list to set for further calculations
     pred_rcmd = pred_rcmd.apply(lambda x: top_k(x, k))
     confusion_df = pd.DataFrame({'pred_rcmd': pred_rcmd.apply(set), 'rcmd': rcmd.apply(set)})
+    # print(confusion_df)
     confusion_df['true_pos'] = confusion_df.apply(lambda x: len(x['pred_rcmd'].intersection(x['rcmd'])), axis=1)
     confusion_df['false_pos'] = confusion_df.apply(lambda x: len(x['pred_rcmd'] - x['rcmd']), axis=1)
     confusion_df['false_neg'] = confusion_df.apply(lambda x: len(x['rcmd'] - x['pred_rcmd']), axis=1)
@@ -158,9 +151,11 @@ def matt_corr(markness, informedness):
 def AUC_ROC(fpr, tpr):
     return metrics.auc(fpr, tpr)
 
-def preprocess_ground(ground_data_path):
+def preprocess_ground(ground_data_path, remove_none=False, remove_star_below=0):
     """
     :param ground_data_path: Relative path for ground truth file
+    :param remove_none: Remove users who do not have >=3 restaurant ratings
+    :param remove_star_below: Remove users who have average rating below this threshold
     :return: preprocessed ground_data
     """
     # pandas df in ['user_id', 'average_stars', 'rcmd_true', 'rcmd_false']
@@ -168,7 +163,18 @@ def preprocess_ground(ground_data_path):
     # append a new column that contains only recommended ids (without score)
     ground_data['rcmd'] = ground_data['rcmd_true'].apply(lambda d: list(d.keys()))
 
+    if remove_none:
+        ground_data = ground_data[ground_data['rcmd'].apply(len) > 0]
+        ground_data = ground_data.reset_index(drop=True)
+
+    if remove_star_below > 0:
+        ground_data = ground_data[ground_data['average_stars'] >= remove_star_below]
+        ground_data = ground_data.reset_index(drop=True)
+
     # rcmd_stats(dict(zip(ground_data['user_id'], ground_data['rcmd_true'])))
+
+
+
 
     return ground_data
 
@@ -189,18 +195,19 @@ def preprocess_pred(pred_data_path, ground_data):
     # set pred_df to have the same user_id ordering as ground_data's
     pred_df = reorder_pred_df(pred_df, ground_data)
 
+
     return pred_df
 
 
 
-def evaluation(pred_data, ground_data):
+def evaluation(pred_data, ground_data, n_restaurant = 411, K=10):
     """
     :param pred_data: preprocessed  pred_data in Pandas DF
     :param ground_data: preprocessed ground_data in Pandas DF
+    :param n_restaurant: total number of restaurants
     :return: evaluation scores in a Pandas DF: {'metric1':[score1, ..., score10], 'metric2': [score 1,..., score10] ....}
     :return: auc-roc score
     """
-    n_resturant = count_total_restaurant()
 
     metrics_funcs = [precision, recall, fallout, missRate, invPrecision]
 
@@ -208,9 +215,9 @@ def evaluation(pred_data, ground_data):
 
     fpr = []
     tpr = []
-    for k in range(10):
+    for k in range(K):
         eval_scores['k'].append(k+1)
-        conf_matrix = confusion_matrix(pred_data['pred_rcmd'], ground_data['rcmd'], n_resturant, k=k+1)
+        conf_matrix = confusion_matrix(pred_data['pred_rcmd'], ground_data['rcmd'], n_restaurant, k=k+1)
         for metric in metrics_funcs:
             temp_score = metric(conf_matrix)
             eval_scores[metric.__name__].append(temp_score)
@@ -239,11 +246,13 @@ def evaluation(pred_data, ground_data):
 
 
 if __name__ == "__main__":
-
+    #
     file_suffix = [str(i+1) for i in range(7)]
     ground_data_path = './data/user_recommend.p'
 
     ground_data = preprocess_ground(ground_data_path)
+
+
     auc_roc = []
     for i in file_suffix:
         print('-------collaborative_filtered_recommendation_0.%s starts!!!-------' % i)
@@ -251,7 +260,7 @@ if __name__ == "__main__":
         pred_data_path = './data/collaborative_filtered_recommendation_0.%s.pickle' % i
 
         pred_data = preprocess_pred(pred_data_path, ground_data)
-        eval_scores, temp_auc_roc = evaluation(pred_data, ground_data)
+        eval_scores, temp_auc_roc = evaluation(pred_data, ground_data, K=5)
         eval_scores.to_csv('%s/eval_score/eval_0.%s.csv' % (DIRNAME, i), index=False)
         auc_roc.append(temp_auc_roc)
         print('-------collaborative_filtered_recommendation_0.%s finished!!!-------' % i)
@@ -259,6 +268,8 @@ if __name__ == "__main__":
 
     auc_df = pd.DataFrame({'i': file_suffix, 'auc_roc': auc_roc})
     auc_df.to_csv('%s/eval_score/auc.csv' % DIRNAME, index=False)
+
+
 
 
 
