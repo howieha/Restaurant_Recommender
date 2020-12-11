@@ -16,8 +16,9 @@ Data files are under `\data` directory. Each database (e.g. prototype, training,
 2. Run `pagerank.py`; this requires functions in `louvain.py`. ---> Output: recommended restaurant for each user.
 
 ## Collabrative Filtering
-1. Run `text_score_calculation.py` to calculate text score of all reviews---> get dataset_review_emo_bayes.tsv file
-2. Run `calculate_user_item_matrix.py` to calculate user-item matrix---> get user_item_matrix.tsv
-   then run `user_avg_ratings.py` to calculate average ratings of each user ---> get user_avg_ratings.tsv file
-   then run `calculate_user_user_similarity.py` and `rebuild_user_user_similarity_matrix.py` one by one to get final user-to-user similarity    matrix ---> get user_user_matrix_nof.tsv file
-3. Run `collabrative_filter.py` with user_item_matrix.tsv, user_user_matrix_nof.tsv, user_avg_ratings.tsv, content_recommendation.pickle to    get the final recommendation.
+1. Run `text_score_calculation.py` to calculate text score of all reviews---> Output: dataset_review_emo_bayes.tsv file
+2. Run `calculate_user_item_matrix.py` to calculate user-item matrix---> Output: user_item_matrix.tsv
+   then run `user_avg_ratings.py` to calculate average ratings of each user ---> Output: user_avg_ratings.tsv file
+   then run `calculate_user_user_similarity.py` and `rebuild_user_user_similarity_matrix.py` one by one to get final user-to-user similarity    Input: matrix ---> Output: user_user_matrix_nof.tsv file
+3. Run `content_recommendation.py`, for each user find businesses that have distances lower than C% of all distances and collate them into a list   Input: result from content-based filtering ---> Output: content_recommendation.pickle
+5. Run `collabrative_filter.py` Input user_item_matrix.tsv, user_user_matrix_nof.tsv, user_avg_ratings.tsv, content_recommendation.pickle --->  Output: the final recommendation.
