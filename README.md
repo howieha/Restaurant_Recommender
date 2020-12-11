@@ -1,11 +1,19 @@
 # Restaurant_Recommender
 Hybrid Recommender System for Restaurant Recommendation
 
+# Prerequisite for Python Library
+SEE `prerequisite` FILE.
+
 ## Data Loading
-Run `envinit.py` to set up database envrionment. Then run `loadcsv.py` to load dataset. Loading all datasets may take some time.
+1. Run `envinit.py` to set up database envrionment; notice that it will provide with a dataset name (e.g. `training`, `test`). Please check your current dataset and make sure that it is the latest version. `envinit.py` will also generate a copy of database environment as `db.p`, to support instant load of evnironment by importing this pickle file.
+2. Then run `loadcsv.py` to load all datasets. Loading all datasets may take some time, until `LOAD FINISHED.` shows up.
 
 ## Data Structure
-Data files are now under `\data` directory. Each database (e.g. prototype, training, testing) should take up its own sub-directory in `\data`.
+Data files are under `\data` directory. Each database (e.g. prototype, training, testing) should take up its own sub-directory in `\data`.
+
+## Content-Based Filtering
+1. Run `ccbusiness.py` to calculate the correlation coefficient matrix. This would output two pickle files, one for the C matrix without filtering as `pctot_raw.p`, and another one with filtering as `pctot.p`. Plotting of heatmap is also available.
+2. Run `pagerank.py`; this requires functions in `louvain.py`. ---> Output: recommended restaurant for each user.
 
 ## Collabrative Filtering
 1. Run `text_score_calculation.py` to calculate text score of all reviews---> get dataset_review_emo_bayes.tsv file
