@@ -6,3 +6,5 @@ Run `envinit.py` to set up database envrionment. Then run `loadcsv.py` to load d
 
 ## Data Structure
 Data files are now under `\data` directory. Each database (e.g. prototype, training, testing) should take up its own sub-directory in `\data`.
+
+## Collabrative Filtering
