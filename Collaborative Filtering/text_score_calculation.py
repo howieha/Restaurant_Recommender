@@ -52,6 +52,7 @@ def predict_sentiment(text, classifier, expected_sentiment=None):
 
 def run_sentiment_analysis_on_rt(review, classifier):
     """
+    Analyze one review text using a known classifier.
     """
     actual_set = collections.defaultdict(set)
     words= re.split(r'[.!]',review)
