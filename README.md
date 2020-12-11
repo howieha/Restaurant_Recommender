@@ -12,4 +12,4 @@ Data files are now under `\data` directory. Each database (e.g. prototype, train
 2. Run `calculate_user_item_matrix.py` to calculate user-item matrix---> get user_item_matrix.tsv
    then run `user_avg_ratings.py` to calculate average ratings of each user ---> get user_avg_ratings.tsv file
    then run `calculate_user_user_similarity.py` and `rebuild_user_user_similarity_matrix.py` one by one to get final user-to-user similarity    matrix ---> get user_user_matrix_nof.tsv file
-3. `Run collabrative_filter.py` with user_item_matrix.tsv, user_user_matrix_nof.tsv, user_avg_ratings.tsv, content_recommendation.pickle to    get the final recommendation.
+3. Run `collabrative_filter.py` with user_item_matrix.tsv, user_user_matrix_nof.tsv, user_avg_ratings.tsv, content_recommendation.pickle to    get the final recommendation.
