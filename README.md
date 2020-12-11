@@ -1,7 +1,7 @@
 # Restaurant_Recommender
 Hybrid Recommender System for Restaurant Recommendation
 
-# Prerequisite for Python Library
+## Prerequisite for Python Library
 SEE `prerequisite` FILE.
 
 ## Data Loading
