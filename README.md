@@ -22,3 +22,6 @@ Data files are under `\data` directory. Each database (e.g. prototype, training,
    then run `calculate_user_user_similarity.py` and `rebuild_user_user_similarity_matrix.py` one by one to get final user-to-user similarity    Input: matrix ---> Output: user_user_matrix_nof.tsv file
 3. Run `content_recommendation.py`, for each user find businesses that have distances lower than C% of all distances and collate them into a list   Input: result from content-based filtering ---> Output: content_recommendation.pickle
 4. Run `collabrative_filter.py` Input user_item_matrix.tsv, user_user_matrix_nof.tsv, user_avg_ratings.tsv, content_recommendation.pickle --->  Output: the final recommendation.
+
+## Evaluation of Model
+1. Run `Eval.py` with recommendaiton result from the previous steps. ---> Output: Sensitivity and evaluation analysis statistics.
